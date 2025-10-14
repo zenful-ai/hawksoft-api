@@ -26,7 +26,7 @@ func main() {
 	}
 
 	// Create a new client
-	apiClient, err := hawksoft.NewClient("https://partner.hawksoft.app/v3")
+	apiClient, err := hawksoft.NewClient("https://integration.hawksoft.app")
 	if err != nil {
 		log.Fatalf("Failed to create client: %v", err)
 	}

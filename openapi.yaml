@@ -10,7 +10,7 @@ info:
     url: https://partner.hawksoft.app
 
 servers:
-  - url: https://partner.hawksoft.app/v3
+  - url: https://integration.hawksoft.app
     description: Production server
 
 security:
