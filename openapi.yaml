@@ -1,0 +1,785 @@
+openapi: 3.0.3
+info:
+  title: HawkSoft Partner API
+  version: "3.0"
+  description: |
+    HawkSoft Partner API allows vendors to integrate with HawkSoft agency management system.
+    All endpoints require Basic authentication and version=3.0 query parameter.
+  contact:
+    name: HawkSoft Support
+    url: https://partner.hawksoft.app
+
+servers:
+  - url: https://partner.hawksoft.app/v3
+    description: Production server
+
+security:
+  - basicAuth: []
+
+paths:
+  /vendor/agencies:
+    get:
+      summary: Get Agencies
+      description: Returns the agency ID for all agencies that have subscribed to a vendor's application
+      operationId: getAgencies
+      tags:
+        - Agencies
+      parameters:
+        - $ref: '#/components/parameters/VersionParam'
+      responses:
+        '200':
+          description: Successful response with list of agencies
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Agency'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+  /vendor/agency/{agencyId}/offices:
+    get:
+      summary: Get Agency Offices
+      description: Returns a list of offices defined for the agency ID
+      operationId: getAgencyOffices
+      tags:
+        - Agencies
+      parameters:
+        - $ref: '#/components/parameters/AgencyIdParam'
+        - $ref: '#/components/parameters/VersionParam'
+      responses:
+        '200':
+          description: Successful response with list of offices
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Office'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+  /vendor/agency/{agencyId}/clients:
+    get:
+      summary: Get Changed Clients
+      description: Get a list of clients changed since a specified date
+      operationId: getChangedClients
+      tags:
+        - Clients
+      parameters:
+        - $ref: '#/components/parameters/AgencyIdParam'
+        - $ref: '#/components/parameters/VersionParam'
+        - name: asOf
+          in: query
+          description: Return clients changed since this datetime (optional)
+          required: false
+          schema:
+            type: string
+            format: date-time
+        - name: deleted
+          in: query
+          description: Include deleted clients
+          required: false
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: Successful response with list of changed clients
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ClientSummary'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+    post:
+      summary: Get Client List
+      description: Retrieve multiple client details by client numbers
+      operationId: getClientList
+      tags:
+        - Clients
+      parameters:
+        - $ref: '#/components/parameters/AgencyIdParam'
+        - $ref: '#/components/parameters/VersionParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                clientNumbers:
+                  type: array
+                  items:
+                    type: string
+                  description: Array of client numbers to retrieve
+      responses:
+        '200':
+          description: Successful response with client details
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ClientData'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+  /vendor/agency/{agencyId}/client/{clientId}:
+    get:
+      summary: Get Client
+      description: Retrieve details for a specific client
+      operationId: getClient
+      tags:
+        - Clients
+      parameters:
+        - $ref: '#/components/parameters/AgencyIdParam'
+        - $ref: '#/components/parameters/ClientIdParam'
+        - $ref: '#/components/parameters/VersionParam'
+        - $ref: '#/components/parameters/ClientIncludesParam'
+      responses:
+        '200':
+          description: Successful response with client details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClientData'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+  /vendor/agency/{agencyId}/clients/search:
+    get:
+      summary: Search Clients
+      description: Search an agency's clients (currently supports policy number search, in development)
+      operationId: searchClients
+      tags:
+        - Clients
+      parameters:
+        - $ref: '#/components/parameters/AgencyIdParam'
+        - $ref: '#/components/parameters/VersionParam'
+        - $ref: '#/components/parameters/ClientIncludesParam'
+        - name: policyNumber
+          in: query
+          description: Policy number to search for
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response with search results
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ClientSummary'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+  /vendor/agency/{agencyId}/client/{clientId}/log:
+    post:
+      summary: Create Log Note
+      description: Create a log note for a client
+      operationId: createLogNote
+      tags:
+        - Client Actions
+      parameters:
+        - $ref: '#/components/parameters/AgencyIdParam'
+        - $ref: '#/components/parameters/ClientIdParam'
+        - $ref: '#/components/parameters/VersionParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LogNote'
+      responses:
+        '201':
+          description: Log note created successfully
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+  /vendor/agency/{agencyId}/client/{clientId}/attachment:
+    post:
+      summary: Upload Attachment
+      description: Upload an attachment to a client record
+      operationId: uploadAttachment
+      tags:
+        - Client Actions
+      parameters:
+        - $ref: '#/components/parameters/AgencyIdParam'
+        - $ref: '#/components/parameters/ClientIdParam'
+        - $ref: '#/components/parameters/VersionParam'
+        - name: RefId
+          in: header
+          required: true
+          schema:
+            type: string
+          description: Reference ID for the attachment
+        - name: Timestamp
+          in: header
+          required: true
+          schema:
+            type: string
+            format: date-time
+          description: Timestamp of the attachment
+        - name: Filename
+          in: header
+          required: true
+          schema:
+            type: string
+          description: Name of the file being uploaded
+        - name: FileExtension
+          in: header
+          required: true
+          schema:
+            type: string
+          description: File extension
+        - name: AssignTask
+          in: header
+          required: false
+          schema:
+            type: boolean
+          description: Whether to assign this as a task
+        - name: AssignedTo
+          in: header
+          required: false
+          schema:
+            type: string
+          description: User to assign task to
+        - name: DueDate
+          in: header
+          required: false
+          schema:
+            type: string
+            format: date-time
+          description: Task due date if assigned
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - file
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: The file to upload
+      responses:
+        '201':
+          description: Attachment uploaded successfully
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+  /vendor/agency/{agencyId}/client/{clientId}/receipts:
+    post:
+      summary: Create Receipts
+      description: Record a payment received by a client (HS6 only). Accepts an array of one or more receipts.
+      operationId: createReceipts
+      tags:
+        - Client Actions
+      parameters:
+        - $ref: '#/components/parameters/AgencyIdParam'
+        - $ref: '#/components/parameters/ClientIdParam'
+        - $ref: '#/components/parameters/VersionParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/Receipt'
+      responses:
+        '201':
+          description: Receipt created successfully
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+components:
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+      description: Basic authentication using vendor credentials
+
+  parameters:
+    VersionParam:
+      name: version
+      in: query
+      description: API version (must be 3.0)
+      required: true
+      schema:
+        type: string
+        enum:
+          - '3.0'
+
+    AgencyIdParam:
+      name: agencyId
+      in: path
+      description: The agency ID
+      required: true
+      schema:
+        type: string
+
+    ClientIdParam:
+      name: clientId
+      in: path
+      description: The client ID
+      required: true
+      schema:
+        type: string
+
+    ClientIncludesParam:
+      name: include
+      in: query
+      description: Optional client includes to retrieve additional data
+      required: false
+      schema:
+        type: array
+        items:
+          type: string
+          enum:
+            - Details
+            - People
+            - Contacts
+            - Claims
+            - Policies
+            - Invoices
+      style: form
+      explode: false
+
+  responses:
+    UnauthorizedError:
+      description: Authentication information is missing or invalid
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    NotFoundError:
+      description: The specified resource was not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+  schemas:
+    Agency:
+      type: integer
+      description: Agency ID
+
+    Office:
+      type: object
+      properties:
+        OfficeId:
+          type: integer
+          description: Unique office identifier
+        OfficeDescription:
+          type: string
+          description: Office description or name
+        SubAgencyName:
+          type: string
+          description: Sub-agency name
+        PrimaryOffice:
+          type: boolean
+          description: Whether this is the primary office
+        AddressLine1:
+          type: string
+          description: Street address line 1
+        AddressLine2:
+          type: string
+          description: Street address line 2
+        City:
+          type: string
+          description: City
+        State:
+          type: string
+          description: State or province
+        Zipcode:
+          type: string
+          description: ZIP or postal code
+
+    ClientSummary:
+      type: object
+      description: Summary information for changed clients
+      properties:
+        ClientNumber:
+          type: integer
+          format: int32
+          description: Client number
+        LastModified:
+          type: string
+          format: date-time
+          description: Last modification timestamp
+        Deleted:
+          type: boolean
+          description: Whether the client has been deleted
+
+    ClientData:
+      type: object
+      description: Complete client information with optional includes
+      required:
+        - ClientNumber
+        - Details
+        - People
+        - Policies
+        - Claims
+        - Contacts
+      properties:
+        ClientNumber:
+          type: integer
+          format: int32
+          description: Client number (required)
+        Details:
+          $ref: '#/components/schemas/ClientDetails'
+        People:
+          type: array
+          items:
+            $ref: '#/components/schemas/Person'
+          description: People associated with the client (required)
+        Contacts:
+          type: array
+          items:
+            $ref: '#/components/schemas/Contact'
+          description: Contact information (required)
+        Policies:
+          type: array
+          items:
+            $ref: '#/components/schemas/Policy'
+          description: Policies associated with the client (required)
+        Claims:
+          type: array
+          items:
+            $ref: '#/components/schemas/Claim'
+          description: Claims associated with the client (required)
+        Invoices:
+          type: array
+          items:
+            $ref: '#/components/schemas/Invoice'
+          description: Invoices (optional, requires include parameter)
+
+    ClientDetails:
+      type: object
+      required:
+        - ClientType
+        - IsCommercial
+        - IsPersonal
+        - Status
+      properties:
+        AgencyNum:
+          type: string
+          description: Agency number (optional)
+        BusinessType:
+          type: string
+          description: Business type enum (optional)
+        ClientType:
+          type: string
+          description: Client type enum (required)
+        CompanyName:
+          type: string
+          description: Company name for commercial clients (optional)
+        IsCommercial:
+          type: boolean
+          description: Whether this is a commercial client (required)
+        IsPersonal:
+          type: boolean
+          description: Whether this is a personal client (required)
+        Status:
+          type: string
+          description: Client status enum (required)
+
+    Person:
+      type: object
+      required:
+        - Gender
+      properties:
+        DateOfBirth:
+          type: string
+          format: date-time
+          description: Date of birth (optional)
+        FirstName:
+          type: string
+          description: First name (optional)
+        LastName:
+          type: string
+          description: Last name (optional)
+        Gender:
+          type: string
+          description: Gender enum (required)
+        Occupation:
+          type: string
+          description: Occupation (optional)
+
+    Contact:
+      type: object
+      required:
+        - Data
+        - Type
+        - IsBillingContact
+      properties:
+        Data:
+          type: string
+          description: Contact data (phone, email, etc.) (required)
+        Type:
+          type: string
+          description: Contact type enum (required)
+        PersonId:
+          type: string
+          format: uuid
+          description: GUID of associated person (optional)
+        IsBillingContact:
+          type: boolean
+          description: Whether this is a billing contact (required)
+
+    Policy:
+      type: object
+      required:
+        - Carrier
+        - LOBs
+        - Status
+        - Type
+      properties:
+        AccountNumber:
+          type: string
+          description: Account number (optional)
+        Carrier:
+          type: string
+          description: Insurance carrier (required)
+        EffectiveDate:
+          type: string
+          format: date-time
+          description: Policy effective date (optional)
+        ExpirationDate:
+          type: string
+          format: date-time
+          description: Policy expiration date (optional)
+        LOBs:
+          type: array
+          items:
+            $ref: '#/components/schemas/LOB'
+          description: Lines of business (required)
+        PolicyNumber:
+          type: string
+          description: Policy number (optional)
+        Premium:
+          type: number
+          format: double
+          description: Policy premium amount (optional)
+        Status:
+          type: string
+          description: Policy status enum (required)
+        Type:
+          type: string
+          description: Policy type enum (required)
+
+    LOB:
+      type: object
+      description: Line of Business
+      properties:
+        Name:
+          type: string
+          description: LOB name
+        Code:
+          type: string
+          description: LOB code
+
+    Claim:
+      type: object
+      required:
+        - ClaimStatus
+      properties:
+        ClaimNumber:
+          type: string
+          description: Claim number (optional)
+        ClaimStatus:
+          type: string
+          description: Claim status enum (required)
+        LossDate:
+          type: string
+          format: date-time
+          description: Loss date (optional)
+        LossAmount:
+          type: number
+          format: double
+          description: Loss amount (optional)
+        PolicyNumber:
+          type: string
+          description: Associated policy number (optional)
+
+    LogNote:
+      type: object
+      required:
+        - Channel
+        - Note
+      properties:
+        Channel:
+          type: string
+          description: Log action channel/type (LogAction enum)
+          enum:
+            - Email
+            - Phone
+            - InPerson
+            - Mail
+            - Fax
+            - Other
+        Note:
+          type: string
+          description: The log note content
+        PolicyId:
+          type: string
+          format: uuid
+          description: Optional GUID of associated policy
+        Task:
+          $ref: '#/components/schemas/TaskAssignment'
+
+    Receipt:
+      type: object
+      required:
+        - RefId
+        - TS
+        - Channel
+        - Invoices
+      properties:
+        RefId:
+          type: string
+          format: uuid
+          description: Unique ID for the receipt (required)
+        TS:
+          type: string
+          format: date-time
+          description: Payment received timestamp (required)
+        PolicyId:
+          type: string
+          format: uuid
+          description: Optional GUID of associated policy
+        OfficeId:
+          type: integer
+          description: Payment's office ID (optional)
+        Channel:
+          type: string
+          description: Source of interaction (LogAction enum, required)
+          enum:
+            - Email
+            - Phone
+            - InPerson
+            - Mail
+            - Fax
+            - Other
+        LogNote:
+          type: string
+          description: Payment log note (optional)
+        Total:
+          type: number
+          format: double
+          description: Total payment amount
+        Invoices:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReceiptInvoiceItem'
+          description: Invoices being paid (required)
+        Task:
+          $ref: '#/components/schemas/TaskAssignment'
+
+    ReceiptInvoiceItem:
+      type: object
+      required:
+        - InvoiceId
+        - Amount
+      properties:
+        InvoiceId:
+          type: string
+          format: uuid
+          description: Invoice GUID (required)
+        Amount:
+          type: number
+          format: double
+          description: Amount being paid towards this invoice (required)
+
+    TaskAssignment:
+      type: object
+      properties:
+        Title:
+          type: string
+          description: Task title
+        Description:
+          type: string
+          description: Task description
+        DueDate:
+          type: string
+          format: date-time
+          description: Task due date
+        AssignedToRole:
+          type: string
+          description: Role to assign task to
+          enum:
+            - SpecifiedUser
+            - Producer
+            - CSR
+            - AccountManager
+            - Underwriter
+        AssignedToEmail:
+          type: string
+          format: email
+          description: Email address (required if AssignedToRole is SpecifiedUser)
+
+    Invoice:
+      type: object
+      required:
+        - Balance
+        - Date
+        - DueDate
+        - InvoiceNumber
+        - Total
+      properties:
+        Balance:
+          type: number
+          format: double
+          description: Invoice balance (required)
+        Date:
+          type: string
+          format: date
+          description: Invoice date (required)
+        DueDate:
+          type: string
+          format: date
+          description: Invoice due date (required)
+        InvoiceNumber:
+          type: string
+          description: Invoice number (required)
+        Total:
+          type: number
+          format: double
+          description: Invoice total amount (required)
+
+    Error:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Error code
+        message:
+          type: string
+          description: Error message
+        details:
+          type: string
+          description: Additional error details
