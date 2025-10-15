@@ -65,7 +65,7 @@ paths:
   /vendor/agency/{agencyId}/clients:
     get:
       summary: Get Changed Clients
-      description: Get a list of clients changed since a specified date
+      description: Get a list of client IDs that have changed since a specified date
       operationId: getChangedClients
       tags:
         - Clients
@@ -79,6 +79,12 @@ paths:
           schema:
             type: string
             format: date-time
+        - name: officeId
+          in: query
+          description: Filter changes by specific office (optional)
+          required: false
+          schema:
+            type: integer
         - name: deleted
           in: query
           description: Include deleted clients
@@ -87,13 +93,15 @@ paths:
             type: boolean
       responses:
         '200':
-          description: Successful response with list of changed clients
+          description: Successful response with array of client IDs
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/ClientSummary'
+                  type: integer
+                  format: int32
+                example: [1, 2, 3, 4]
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '404':
@@ -161,7 +169,7 @@ paths:
   /vendor/agency/{agencyId}/clients/search:
     get:
       summary: Search Clients
-      description: Search an agency's clients (currently supports policy number search, in development)
+      description: Search an agency's clients (currently supports exact policy number search, in development)
       operationId: searchClients
       tags:
         - Clients
@@ -171,19 +179,19 @@ paths:
         - $ref: '#/components/parameters/ClientIncludesParam'
         - name: policyNumber
           in: query
-          description: Policy number to search for
+          description: Exact policy number to search for
           required: false
           schema:
             type: string
       responses:
         '200':
-          description: Successful response with search results
+          description: Successful response with full client data (empty array if no matches)
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/ClientSummary'
+                  $ref: '#/components/schemas/ClientData'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
 
@@ -418,22 +426,6 @@ components:
         Zipcode:
           type: string
           description: ZIP or postal code
-
-    ClientSummary:
-      type: object
-      description: Summary information for changed clients
-      properties:
-        ClientNumber:
-          type: integer
-          format: int32
-          description: Client number
-        LastModified:
-          type: string
-          format: date-time
-          description: Last modification timestamp
-        Deleted:
-          type: boolean
-          description: Whether the client has been deleted
 
     ClientData:
       type: object
