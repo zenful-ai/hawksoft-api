@@ -107,6 +107,29 @@ export HAWKSOFT_PASSWORD=your_password
 go run example/main.go
 ```
 
+### Handling Date/Time Fields
+
+The HawkSoft API uses inconsistent date/time formats:
+
+- **DateTime fields without timezone** (e.g., Policy dates, DateOfBirth): `"2024-10-08T00:00:00"`
+  - These are returned as `*string` in the Go client
+  - Use the provided helper functions to parse/format:
+    ```go
+    // Parse API response
+    effectiveDate := hawksoft.DateTimePtrToTime(policy.EffectiveDate)
+
+    // Format for API request
+    policy.EffectiveDate = hawksoft.TimeToDateTimePtr(time.Now())
+    ```
+
+- **Date fields** (e.g., Invoice dates): `"2024-10-08"`
+  - These use `openapi_types.Date` which handles serialization automatically
+
+- **RFC3339 timestamps** (e.g., Receipt.TS): `"2024-10-08T00:00:00Z"`
+  - These use `time.Time` and standard Go time parsing
+
+See `example/date_example.go` for complete examples.
+
 ### Regenerating the Client
 
 If you update the OpenAPI spec, regenerate the client with:

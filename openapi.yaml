@@ -507,8 +507,7 @@ components:
       properties:
         DateOfBirth:
           type: string
-          format: date-time
-          description: Date of birth (optional)
+          description: Date of birth in format 2024-10-08T00:00:00 (optional)
         FirstName:
           type: string
           description: First name (optional)
@@ -559,12 +558,10 @@ components:
           description: Insurance carrier (required)
         EffectiveDate:
           type: string
-          format: date-time
-          description: Policy effective date (optional)
+          description: Policy effective date in format 2024-10-08T00:00:00 (optional)
         ExpirationDate:
           type: string
-          format: date-time
-          description: Policy expiration date (optional)
+          description: Policy expiration date in format 2024-10-08T00:00:00 (optional)
         LOBs:
           type: array
           items:
@@ -608,8 +605,7 @@ components:
           description: Claim status enum (required)
         LossDate:
           type: string
-          format: date-time
-          description: Loss date (optional)
+          description: Loss date in format 2024-10-08T00:00:00 (optional)
         LossAmount:
           type: number
           format: double

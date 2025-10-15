@@ -22,6 +22,7 @@ func main() {
 		fmt.Println("This example will show the API structure without making actual calls.")
 		fmt.Println("\nTo test with real credentials, set these environment variables and run again.")
 		demonstrateAPI()
+		ExampleDateHandling()
 		return
 	}
 
