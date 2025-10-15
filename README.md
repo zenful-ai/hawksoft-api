@@ -6,7 +6,7 @@ OpenAPI 3.0 specification for the HawkSoft Partner API v3.0.
 
 - **API Reference**: https://partner.hawksoft.app/v3/api.html
 - **Data Model Documentation**: https://partner.hawksoft.app/v3/model.html
-- **Base URL**: https://partner.hawksoft.app/v3
+- **Base URL**: https://integration.hawksoft.app
 
 ## Authentication
 
@@ -77,7 +77,7 @@ import (
 
 func main() {
     // Create client
-    client, err := hawksoft.NewClient("https://partner.hawksoft.app/v3")
+    client, err := hawksoft.NewClient("https://integration.hawksoft.app")
     if err != nil {
         panic(err)
     }
