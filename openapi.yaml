@@ -545,41 +545,212 @@ components:
     Policy:
       type: object
       required:
+        - AdditionalInterests
+        - ApplicationType
+        - Autos
+        - BillingType
+        - BoatOperators
+        - Boats
         - Carrier
+        - Coverages
+        - Drivers
+        - Id
         - LOBs
+        - LocationReferences
+        - Locations
+        - Modified
+        - NumberOfTerms
+        - OfficeId
+        - PaymentPlan
+        - PolicyIndex
+        - PolicyState
+        - PremiumMode
+        - Program
+        - RaterCode
         - Status
+        - StatusDate
+        - Term
+        - Title
         - Type
       properties:
         AccountNumber:
           type: string
-          description: Account number (optional)
+          description: An agency created account number or other identifier
+        AdditionalInterests:
+          type: array
+          description: Additional interest parties associated with the policy
+          items:
+            type: object
+        Agent1:
+          type: string
+          description: Policy level agent field for tracking writing and commission amounts
+        Agent2:
+          type: string
+          description: Policy level agent field for tracking writing and commission amounts
+        Agent3:
+          type: string
+          description: Policy level agent field for tracking writing and commission amounts
+        AgentCode:
+          type: string
+          description: Agent code assigned by the carrier
+        ApplicationType:
+          type: string
+          description: 'Application type, e.g. "Personal", "Commercial", "Agriculture"'
+        Autos:
+          type: array
+          description: Auto vehicles associated with the policy
+          items:
+            type: object
+        BillingPlan:
+          type: string
+          description: Billing plan assigned to the policy
+        BillingType:
+          type: string
+          description: 'Billing type, e.g. "Direct", "Agency Bill", "Premium Finance"'
+        BoatOperators:
+          type: array
+          description: Boat operators associated with the policy
+          items:
+            type: object
+        Boats:
+          type: array
+          description: Boat vehicles covered by the policy
+          items:
+            type: object
         Carrier:
           type: string
-          description: Insurance carrier (required)
+          description: Insuring carrier or general agency for the policy
+        Coverages:
+          type: array
+          description: Coverage records on the policy
+          items:
+            type: object
+        Drivers:
+          type: array
+          description: Drivers associated with the policy
+          items:
+            type: object
         EffectiveDate:
           type: string
-          description: Policy effective date in format 2024-10-08T00:00:00 (optional)
+          format: date-time
+          description: Date the current policy term goes into effect
         ExpirationDate:
           type: string
-          description: Policy expiration date in format 2024-10-08T00:00:00 (optional)
+          format: date-time
+          description: Date the current policy term expires
+        Id:
+          type: string
+          format: uuid
+          description: Unique policy identifier
+        InceptionDate:
+          type: string
+          format: date-time
+          description: Date the policy was originally written
         LOBs:
           type: array
+          description: Lines of business associated with the policy
           items:
             $ref: '#/components/schemas/LOB'
-          description: Lines of business (required)
+        LegacyId:
+          type: integer
+          format: int32
+          description: Legacy policy identifier
+        LocationReferences:
+          type: array
+          description: Location references associated with the policy
+          items:
+            type: object
+        Locations:
+          type: array
+          description: Locations tied to the policy
+          items:
+            type: object
+        Modified:
+          type: string
+          format: date-time
+          description: Last modified timestamp for the policy
+        NAIC:
+          type: string
+          description: NAIC number assigned to the underwriting company
+        NonCommissionable:
+          type: number
+          format: double
+          description: Non-commissionable amount on the policy
+        Note:
+          type: string
+          description: Agency notes recorded for the policy
+        NumberOfTerms:
+          type: integer
+          format: int32
+          description: Number of terms the policy has had
+        OfficeId:
+          type: integer
+          format: int32
+          description: Identifier for the agency office assigned to the policy
+        PaymentPlan:
+          type: string
+          description: Payment plan applied to the policy, e.g. "Monthly" or "Annual"
+        PolicyIndex:
+          type: integer
+          format: int32
+          description: >-
+            Position on the client file where the policy appears; the first policy entered
+            has an index of 0 and subsequent policies increment from there
         PolicyNumber:
           type: string
-          description: Policy number (optional)
+          description: Policy number assigned by the carrier
+        PolicyState:
+          type: string
+          description: State in which the policy is written
         Premium:
           type: number
           format: double
-          description: Policy premium amount (optional)
+          description: Policy premium amount
+        PremiumMode:
+          type: string
+          description: >-
+            Premium mode; when set to "Annualize" the premium reflects a 12-month
+            equivalent regardless of term length
+        Program:
+          type: string
+          description: Policy program or underwriting tier
+        QuotedPremium:
+          type: number
+          format: double
+          description: Quoted premium prior to issue
+        RaterCode:
+          type: integer
+          format: int32
+          description: Rater code associated with the policy record
+        SoldDate:
+          type: string
+          format: date-time
+          description: Original sold date for the policy
+        Source:
+          type: string
+          description: Source of the policy as configured by the agency
         Status:
           type: string
-          description: Policy status enum (required)
+          description: Current status of the policy
+        StatusDate:
+          type: string
+          format: date-time
+          description: Effective date of the current status
+        SubStatus:
+          type: string
+          description: Current sub-status of the policy
+        Term:
+          type: string
+          description: Policy term descriptor
+        Title:
+          type: string
+          description: Policy title, e.g. "AUTOP", "PKGE", "CPKGE"
         Type:
           type: string
-          description: Policy type enum (required)
+          description: Policy type, e.g. "Auto", "Home", "General"
+        WritingCarrier:
+          type: string
+          description: Writing carrier associated with the policy
 
     LOB:
       type: object
