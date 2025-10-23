@@ -632,11 +632,9 @@ components:
             type: object
         EffectiveDate:
           type: string
-          format: date-time
           description: Date the current policy term goes into effect
         ExpirationDate:
           type: string
-          format: date-time
           description: Date the current policy term expires
         Id:
           type: string
@@ -644,7 +642,6 @@ components:
           description: Unique policy identifier
         InceptionDate:
           type: string
-          format: date-time
           description: Date the policy was originally written
         LOBs:
           type: array
@@ -724,7 +721,6 @@ components:
           description: Rater code associated with the policy record
         SoldDate:
           type: string
-          format: date-time
           description: Original sold date for the policy
         Source:
           type: string
@@ -734,7 +730,6 @@ components:
           description: Current status of the policy
         StatusDate:
           type: string
-          format: date-time
           description: Effective date of the current status
         SubStatus:
           type: string
